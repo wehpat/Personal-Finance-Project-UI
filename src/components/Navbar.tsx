@@ -3,26 +3,45 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
+import * as LucideIcons from 'lucide-react';
+
+
+type LucideIconName = keyof typeof LucideIcons;
+
+// Type-safe dynamic icon component
+const DynamicIcon = ({ name, className }: { name: LucideIconName; className?: string }) => {
+    const IconComponent = LucideIcons[name];
+
+    // Type guard to check if component exists
+    if (!IconComponent) {
+        console.warn(`Icon "${name}" not found, using HelpCircle fallback`);
+        return <LucideIcons.HelpCircle className={className || "w-5 h-5"} />;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    return <IconComponent className={className || "w-5 h-5"} />;
+};
 
 export function Navbar({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const [isCollapsed, setIsCollapsed] = useState(false);
 
-    /* Temporary NavBar */
+    /* NavBar Items with properly typed icon names will soon integrate it from API */
     const mainNavItems = [
-        { href: '/dashboard', label: 'Dashboard', icon: '📊', code: 'dashboard', position: 1 },
-        { href: '/portfolio', label: 'Portfolio', icon: '📁', code: 'portfolio', position: 3 },
-        { href: '/blog', label: 'Blog', icon: '📝', code: 'blog', position: 3 },
-        { href: '/contact', label: 'Contact', icon: '📧', code: 'contact', position: 4 }
+        { href: '/dashboard', label: 'Dashboard', iconName: 'LayoutDashboard' as const, position: 1 },
+        { href: '/payments', label: 'Payments', iconName: 'WalletMinimal' as const, position: 2 },
+
+        { href: '/history', label: 'History', iconName: 'History' as const, position: 4 },
+        { href: '/plan', label: 'Plan', iconName: 'NotebookPen' as const, position: 3 }
     ];
 
-    /* Temporary FootNavItem */
+    /* Footer NavItems will soon integrate it from API*/
     const footerNavItems = [
-        { href: '/about', label: 'About', icon: 'ℹ️', code: 'about', position: 1 },
-        { href: '/settings', label: 'Settings', icon: '⚙️', code: 'settings', position: 2 }
+        { href: '/about', label: 'About', iconName: 'Info' as const, position: 1 },
+        { href: '/settings', label: 'Settings', iconName: 'Settings' as const, position: 2 }
     ];
 
-    /* Will turn this global state so whe */
     const toggleNavbar = () => {
         setIsCollapsed(!isCollapsed);
     };
@@ -38,7 +57,7 @@ export function Navbar({ children }: { children: React.ReactNode }) {
                 `}
             >
                 <div className="flex flex-col h-full relative">
-                    {/* Toggle Button - Centered Vertically */}
+                    {/* Toggle Button */}
                     <button
                         onClick={toggleNavbar}
                         className={`
@@ -51,12 +70,13 @@ export function Navbar({ children }: { children: React.ReactNode }) {
                         `}
                         aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
                     >
-                        <span className="text-sm font-bold text-gray-600">
-                            {isCollapsed ? '→' : '←'}
-                        </span>
+                        {isCollapsed ? (
+                            <LucideIcons.CircleArrowRight className="w-5 h-5 text-gray-600" />
+                        ) : (
+                            <LucideIcons.CircleArrowLeft className="w-5 h-5 text-gray-600" />
+                        )}
                     </button>
 
-                    {/* Logo Section */}
                     <div className={`p-6 border-b border-gray-200 ${isCollapsed ? 'px-4' : ''}`}>
                         <Link href="/">
                             {isCollapsed ? (
@@ -89,16 +109,22 @@ export function Navbar({ children }: { children: React.ReactNode }) {
                                                 }
                                                 `}
                                             >
-                                                <span className="text-xl transition-transform duration-200 group-hover:scale-110">
-                                                    {page.icon}
-                                                </span>
+                                                <DynamicIcon
+                                                    name={page.iconName}
+                                                    className={`
+                                                        transition-all duration-200
+                                                        ${isActive ? 'text-blue-700' : 'text-gray-500'}
+                                                        group-hover:scale-110
+                                                        ${isCollapsed ? 'w-6 h-6' : 'w-5 h-5'}
+                                                    `}
+                                                />
                                                 {!isCollapsed && (
                                                     <>
                                                         <span className="font-medium">{page.label}</span>
                                                         {isActive && (
-                                                            <span className="ml-auto text-blue-700 transition-transform duration-200 group-hover:translate-x-1">
-                                                                →
-                                                            </span>
+                                                            <LucideIcons.ArrowRight
+                                                                className="ml-auto w-4 h-4 text-blue-700 transition-transform duration-200 group-hover:translate-x-1"
+                                                            />
                                                         )}
                                                     </>
                                                 )}
@@ -146,16 +172,22 @@ export function Navbar({ children }: { children: React.ReactNode }) {
                                                     }
                                                     `}
                                                 >
-                                                    <span className="text-xl transition-transform duration-200 group-hover:scale-110">
-                                                        {page.icon}
-                                                    </span>
+                                                    <DynamicIcon
+                                                        name={page.iconName}
+                                                        className={`
+                                                            transition-all duration-200
+                                                            ${isActive ? 'text-blue-700' : 'text-gray-500'}
+                                                            group-hover:scale-110
+                                                            ${isCollapsed ? 'w-6 h-6' : 'w-5 h-5'}
+                                                        `}
+                                                    />
                                                     {!isCollapsed && (
                                                         <>
                                                             <span className="font-medium">{page.label}</span>
                                                             {isActive && (
-                                                                <span className="ml-auto text-blue-700 transition-transform duration-200 group-hover:translate-x-1">
-                                                                    →
-                                                                </span>
+                                                                <LucideIcons.ArrowRight
+                                                                    className="ml-auto w-4 h-4 text-blue-700 transition-transform duration-200 group-hover:translate-x-1"
+                                                                />
                                                             )}
                                                         </>
                                                     )}
@@ -202,7 +234,7 @@ export function Navbar({ children }: { children: React.ReactNode }) {
                 </div>
             </nav>
 
-            {/* Main content - adjusts margin based on collapsed state */}
+            {/* Main content */}
             <main
                 className={`
                     flex-1 min-h-screen bg-gray-50
