@@ -4,24 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import * as LucideIcons from 'lucide-react';
-
-
-type LucideIconName = keyof typeof LucideIcons;
-
-// Type-safe dynamic icon component
-const DynamicIcon = ({ name, className }: { name: LucideIconName; className?: string }) => {
-    const IconComponent = LucideIcons[name];
-
-    // Type guard to check if component exists
-    if (!IconComponent) {
-        console.warn(`Icon "${name}" not found, using HelpCircle fallback`);
-        return <LucideIcons.HelpCircle className={className || "w-5 h-5"} />;
-    }
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    return <IconComponent className={className || "w-5 h-5"} />;
-};
+import { DynamicIcon } from "@iso/utils/DynamicIcon";
 
 export function Navbar({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
@@ -31,9 +14,10 @@ export function Navbar({ children }: { children: React.ReactNode }) {
     const mainNavItems = [
         { href: '/dashboard', label: 'Dashboard', iconName: 'LayoutDashboard' as const, position: 1 },
         { href: '/payments', label: 'Payments', iconName: 'WalletMinimal' as const, position: 2 },
-
-        { href: '/history', label: 'History', iconName: 'History' as const, position: 4 },
-        { href: '/plan', label: 'Plan', iconName: 'NotebookPen' as const, position: 3 }
+        { href: '/transaction', label: 'Transaction', iconName: 'Banknote' as const, position: 3  },
+        { href: '/monitor', label: 'Monitor', iconName: 'Monitor' as const, position: 4 },
+        { href: '/history', label: 'History', iconName: 'History' as const, position: 5 },
+        { href: '/plan', label: 'Plan', iconName: 'NotebookPen' as const, position: 6 }
     ];
 
     /* Footer NavItems will soon integrate it from API*/
@@ -88,7 +72,7 @@ export function Navbar({ children }: { children: React.ReactNode }) {
                     </div>
 
                     {/* Main Navigation */}
-                    <div className="flex-1 p-4">
+                    <div className="flex-1 p-4 overflow-y-auto">
                         <ul className="space-y-2">
                             {mainNavItems
                                 .sort((a, b) => a.position - b.position)
